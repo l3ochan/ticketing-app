@@ -1,6 +1,7 @@
 Django>=5.0,<6.0
 djangorestframework
 django-filter
+django-environ
 psycopg2-binary
 watchfiles   
 python-dotenv
