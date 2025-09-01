@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Ticket {{ object.id }}{% endblock %}
+{% block content %}
+<h1>{{ object.title }}</h1>
+<p><strong>Statut :</strong> {{ object.get_status_display }}</p>
+<p><strong>Description :</strong> {{ object.description }}</p>
+<p><strong>Client :</strong> {{ object.client }}</p>
+<p><strong>Projet :</strong> {{ object.project }}</p>
+<p><strong>Créé par :</strong> {{ object.reporter }}</p>
+
+<a class="btn btn-secondary" href="{% url 'tickets:ticket_update' object.id %}">Modifier</a>
+<form method="post" action="{% url 'tickets:ticket_close' object.id %}" style="display:inline;">
+  {% csrf_token %}
+  <button class="btn btn-danger">Clôturer</button>
+</form>
+{% endblock %}

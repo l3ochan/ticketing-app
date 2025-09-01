@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Liste des tickets{% endblock %}
+{% block content %}
+<h1>Tickets</h1>
+<a class="btn btn-primary" href="{% url 'tickets:ticket_create' %}">Nouveau ticket</a>
+<table class="table mt-3">
+  <thead>
+    <tr>
+      <th>ID</th><th>Titre</th><th>Statut</th><th>Client</th><th>Projet</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for t in object_list %}
+    <tr>
+      <td>{{ t.id }}</td>
+      <td><a href="{% url 'tickets:ticket_detail' t.id %}">{{ t.title }}</a></td>
+      <td>{{ t.get_status_display }}</td>
+      <td>{{ t.client }}</td>
+      <td>{{ t.project }}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="5">Aucun ticket</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
