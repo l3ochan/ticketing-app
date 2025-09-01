@@ -1,0 +1,4 @@
+.env
+help.md
+__pycache__/
+*.pyc
