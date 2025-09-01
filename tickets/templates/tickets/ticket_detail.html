@@ -3,10 +3,22 @@
 {% block content %}
 <h1>{{ object.title }}</h1>
 <p><strong>Statut :</strong> {{ object.get_status_display }}</p>
+
 <p><strong>Description :</strong> {{ object.description }}</p>
-<p><strong>Client :</strong> {{ object.client }}</p>
+
+<!-- ICI: "Client" => customer -->
+<p><strong>Client :</strong> {{ object.customer }}</p>
+
 <p><strong>Projet :</strong> {{ object.project }}</p>
-<p><strong>Créé par :</strong> {{ object.reporter }}</p>
+
+<!-- "Créé par" : montrer le reporter s'il existe, sinon le customer -->
+<p><strong>Ouvert par :</strong>
+  {% if object.reporter %}
+    {{ object.reporter }}
+  {% else %}
+    {{ object.customer }}
+  {% endif %}
+</p>
 
 <a class="btn btn-secondary" href="{% url 'tickets:ticket_update' object.id %}">Modifier</a>
 <form method="post" action="{% url 'tickets:ticket_close' object.id %}" style="display:inline;">

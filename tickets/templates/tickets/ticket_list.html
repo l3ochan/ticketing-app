@@ -6,7 +6,7 @@
 <table class="table mt-3">
   <thead>
     <tr>
-      <th>ID</th><th>Titre</th><th>Statut</th><th>Client</th><th>Projet</th>
+      <th>ID</th><th>Titre</th><th>Statut</th><th>Client</th><th>Reporter</th><th>Projet</th>
     </tr>
   </thead>
   <tbody>
@@ -15,7 +15,8 @@
       <td>{{ t.id }}</td>
       <td><a href="{% url 'tickets:ticket_detail' t.id %}">{{ t.title }}</a></td>
       <td>{{ t.get_status_display }}</td>
-      <td>{{ t.client }}</td>
+      <td>{{ t.customer }}</td>
+      <td>{{ t.reporter }}</td>
       <td>{{ t.project }}</td>
     </tr>
   {% empty %}
