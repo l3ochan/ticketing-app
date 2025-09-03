@@ -8,5 +8,6 @@ urlpatterns = [
     path("<int:pk>/", views.TicketDetailView.as_view(), name="ticket_detail"),
     path("<int:pk>/edit/", views.TicketUpdateView.as_view(), name="ticket_update"),
     path("<int:pk>/close/", views.ticket_close, name="ticket_close"),
+    path("<int:pk>/comment/", views.add_comment, name="add_comment"),
     # CRUD clients/projets idem
 ]

@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from .models import Ticket, Project
@@ -7,6 +7,10 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django import forms
+from django.shortcuts import render
+from django.views.decorators.http import require_POST
+from django.contrib import messages
+from .models import Ticket, Comment
 
 
 User = get_user_model()
@@ -35,15 +39,21 @@ class TicketListView(LoginRequiredMixin, ClientScopedQuerysetMixin, ListView):
     ordering = "-created_at"
 
 
-
-class TicketDetailView(LoginRequiredMixin, ClientScopedQuerysetMixin, DetailView):
+class TicketDetailView(LoginRequiredMixin, DetailView):
     model = Ticket
+    template_name = "tickets/ticket_detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = CommentForm()
+        return context
+
 
 
 class TicketCreateView(LoginRequiredMixin, CreateView):
     model = Ticket
     # on liste 'customer' pour les reporters/devs, mais on le retire pour les clients
-    fields = ["title", "description", "customer", "project", "priority", "assignee"]
+    fields = ["title", "description", "reporter", "customer", "project", "priority", "assignee"]
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -53,6 +63,7 @@ class TicketCreateView(LoginRequiredMixin, CreateView):
             # 👉 client : on enlève le champ du formulaire (sinon il est requis et non posté)
             form.fields.pop("customer", None)
             form.fields.pop("assignee", None)
+            form.fields.pop("reporter", None)
             # et on fixe la valeur sur l'instance AVANT validation
             form.instance.customer = user
             # restreindre les projets du select
@@ -88,9 +99,30 @@ class TicketUpdateView(LoginRequiredMixin, ClientScopedQuerysetMixin, UpdateView
     model = Ticket
     fields = ["title","description","priority","assignee","status"]
 
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ["body"]
+        widgets = {
+            "body": forms.Textarea(attrs={"rows": 2, "placeholder": "Écrire un message..."})
+        }
 
 @login_required
 @require_POST
+def add_comment(request, pk):
+    ticket = get_object_or_404(Ticket, pk=pk)
+    form = CommentForm(request.POST)
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.ticket = ticket
+        comment.author = request.user
+        comment.save()
+        messages.success(request, "Message envoyé.")
+    else:
+        messages.error(request, "Erreur lors de l’envoi du message.")
+    return redirect("tickets:ticket_detail", pk=pk)
+
+
 def ticket_close(request, pk):
     t = get_object_or_404(Ticket, pk=pk)
     # Clients : jamais
@@ -103,5 +135,3 @@ def ticket_close(request, pk):
     t.closed_at = timezone.now()
     t.save()
     return redirect("tickets:ticket_detail", pk=pk)
-
-
