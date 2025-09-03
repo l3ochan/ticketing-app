@@ -6,8 +6,8 @@
 
 <p><strong>Description :</strong> {{ object.description }}</p>
 
-<a class="btn btn-secondary" href="{% url 'projects:project_update' object.id %}">Modifier le projet</a>
-<a class="btn btn-primary" href="{% url 'projects:project_list' %}">Retour à la liste</a>
+<a class="btn btn-secondary" href="{% url 'tickets:project_update' object.id %}">Modifier le projet</a>
+<a class="btn btn-primary" href="{% url 'tickets:project_list' %}">Retour à la liste</a>
 
 <h2 class="mt-4">Tickets liés</h2>
 <table class="table table-striped">

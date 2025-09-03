@@ -51,6 +51,7 @@ ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = "accounts.User"
 LOGOUT_REDIRECT_URL = "login" 
+LOGIN_REDIRECT_URL = "/tickets/dashboard"
 
 # Application definition
 

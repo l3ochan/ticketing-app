@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
 from django.views.decorators.http import require_POST
@@ -8,17 +8,17 @@ from django.contrib.auth import get_user_model
 from django import forms
 from django.contrib import messages
 from .models import Ticket, Project, Comment, Client
-from django.utils.timezone import now
-from django.shortcuts import render
 from django.db.models import Count
-from .models import Ticket
+from django.core.exceptions import PermissionDenied
 
+def custom_permission_denied_view(request, exception=None):
+    return render(request, '403.html', status=403)
 
 User = get_user_model()
 
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "tickets/dashboard.html"
-
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         tickets = Ticket.objects.all()
@@ -52,16 +52,16 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
         return context
 class ReporterRequiredMixin(UserPassesTestMixin):
-    def test_func(self): return self.request.user.is_authenticated and self.request.user.is_reporter
+    def test_func(self): return self.request.user.is_authenticated and (self.request.user.is_reporter or self.request.user.is_staff or self.request.user.is_superuser)
 
 class DeveloperRequiredMixin(UserPassesTestMixin):
-    def test_func(self): return self.request.user.is_authenticated and self.request.user.is_developer
+    def test_func(self): return self.request.user.is_authenticated and (self.request.user.is_developer or self.request.user.is_staff or self.request.user.is_superuser)
+
+
 
 # --- Vu des projets ---
 class ProjectListView(LoginRequiredMixin, ListView):
     model = Project
-    paginate_by = 20
-    ordering = "name"
     template_name = "projects/project_list.html"
 
 
@@ -89,14 +89,6 @@ class ProjectUpdateView(LoginRequiredMixin, DeveloperRequiredMixin, UpdateView):
         messages.success(self.request, "Projet mis à jour")
         return super().form_valid(form)
 
-# --- Mixins pour filtrer les rôles ---
-class ReporterRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        return self.request.user.is_authenticated and getattr(self.request.user, "role", None) == "REP"
-
-class DeveloperRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        return self.request.user.is_authenticated and getattr(self.request.user, "role", None) == "DEV"
 
 
 # --- Vues Tickets ---
@@ -114,12 +106,12 @@ class ClientListView(LoginRequiredMixin, ReporterRequiredMixin, ListView):
     template_name = "clients/client_list.html"
 
 
-class ClientDetailView(LoginRequiredMixin, ReporterRequiredMixin, DetailView):
+class ClientDetailView(LoginRequiredMixin, ReporterRequiredMixin,DetailView):
     model = Client
     template_name = "clients/client_detail.html"
 
 
-class ClientCreateView(LoginRequiredMixin, ReporterRequiredMixin, CreateView):
+class ClientCreateView(LoginRequiredMixin, ReporterRequiredMixin,CreateView):
     model = Client
     fields = ["name", "phone_number", "company"]
     template_name = "clients/client_form.html"
@@ -129,7 +121,7 @@ class ClientCreateView(LoginRequiredMixin, ReporterRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class ClientUpdateView(LoginRequiredMixin, ReporterRequiredMixin, UpdateView):
+class ClientUpdateView(LoginRequiredMixin, ReporterRequiredMixin,  UpdateView):
     model = Client
     fields = ["name", "phone_number", "company"]
     template_name = "clients/client_form.html"
@@ -149,7 +141,7 @@ class TicketDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class TicketCreateView(LoginRequiredMixin, ReporterRequiredMixin, CreateView):
+class TicketCreateView(LoginRequiredMixin, ReporterRequiredMixin,  CreateView):
     model = Ticket
     fields = ["title", "description", "client", "project", "priority", "assignee"]
 

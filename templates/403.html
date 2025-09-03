@@ -1,0 +1,10 @@
+<!-- templates/403.html -->
+{% extends "base.html" %}
+{% block title %}Accès refusé{% endblock %}
+{% block content %}
+<div class="alert alert-danger mt-3">
+  <h1>403 - Accès refusé</h1>
+  <p>Vous n'avez pas la permission d'accéder à cette page.</p>
+  <a href="{% url 'tickets:dashboard' %}" class="btn btn-primary">Retour à l'accueil</a>
+</div>
+{% endblock %}

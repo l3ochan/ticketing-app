@@ -1,9 +1,10 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import RedirectView 
-from django.contrib.auth.views import LogoutView
 from accounts.views import logout_any
+from django.conf.urls import handler403
 
+handler403 = 'tickets.views.custom_permission_denied_view'
 
 urlpatterns = [
     path("admin/", admin.site.urls),
