@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}
+{% if object %}Modifier le projet{% else %}Créer un projet{% endif %}
+{% endblock %}
+
+{% block content %}
+<h1>
+{% if object %}Modifier le projet{% else %}Créer un projet{% endif %}
+</h1>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+
+  <button type="submit" class="btn btn-success">
+    {% if object %}Mettre à jour{% else %}Créer{% endif %}
+  </button>
+  <a class="btn btn-secondary" href="{% url 'tickets:project_list' %}">Annuler</a>
+</form>
+{% endblock %}

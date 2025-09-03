@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h1>Statistiques des tickets</h1>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h4>Total des tickets</h4>
+            <p>{{ total_tickets }}</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h4>Tickets traités</h4>
+            <p>{{ processed_tickets }}</p>
+        </div>
+    </div>
+</div>
+
+<h3>Tickets par priorité</h3>
+<table class="table table-striped">
+    <thead>
+        <tr><th>Priorité</th><th>Nombre</th></tr>
+    </thead>
+    <tbody>
+        {% for p in tickets_by_priority %}
+        <tr>
+            <td>
+                {% if p.label == "Urgente" %}
+                  <span class="text-danger fw-bold">{{ p.label }}</span>
+                {% elif p.label == "Haute" %}
+                  <span class="text-warning fw-bold">{{ p.label }}</span>
+                {% else %}
+                  {{ p.label }}
+                {% endif %}
+            </td>
+            <td>{{ p.count }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="2">Aucun ticket</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+<h3>Tickets par statut</h3>
+<table class="table table-striped">
+    <thead>
+        <tr><th>Statut</th><th>Nombre</th></tr>
+    </thead>
+    <tbody>
+        {% for s in tickets_by_status %}
+        <tr>
+            <td>{{ s.label }}</td>  {# Friendly label, ex: Ouvert, Fermé #}
+            <td>{{ s.count }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="2">Aucun ticket</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

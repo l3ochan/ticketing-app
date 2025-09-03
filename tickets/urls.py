@@ -9,5 +9,13 @@ urlpatterns = [
     path("<int:pk>/edit/", views.TicketUpdateView.as_view(), name="ticket_update"),
     path("<int:pk>/close/", views.ticket_close, name="ticket_close"),
     path("<int:pk>/comment/", views.add_comment, name="add_comment"),
-    # CRUD clients/projets idem
+    path("clients/", views.ClientListView.as_view(), name="client_list"),
+    path("clients/new/", views.ClientCreateView.as_view(), name="client_create"),
+    path("clients/<int:pk>/", views.ClientDetailView.as_view(), name="client_detail"),
+    path("clients/<int:pk>/edit/", views.ClientUpdateView.as_view(), name="client_update"),
+    path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
+    path("projects/", views.ProjectListView.as_view(), name="project_list"),
+    path("projects/new/", views.ProjectCreateView.as_view(), name="project_create"),
+    path("projects/<int:pk>/", views.ProjectDetailView.as_view(), name="project_detail"),
+    path("projects/<int:pk>/edit/", views.ProjectUpdateView.as_view(), name="project_update"),
 ]

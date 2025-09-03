@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Détails du projet{% endblock %}
+
+{% block content %}
+<h1>Projet : {{ object.name }}</h1>
+
+<p><strong>Description :</strong> {{ object.description }}</p>
+
+<a class="btn btn-secondary" href="{% url 'projects:project_update' object.id %}">Modifier le projet</a>
+<a class="btn btn-primary" href="{% url 'projects:project_list' %}">Retour à la liste</a>
+
+<h2 class="mt-4">Tickets liés</h2>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Titre</th>
+      <th>Status</th>
+      <th>Priorité</th>
+      <th>Client</th>
+      <th>Reporter</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for ticket in object.tickets.all %}
+    <tr>
+      <td>{{ ticket.id }}</td>
+      <td><a href="{% url 'tickets:ticket_detail' ticket.id %}">{{ ticket.title }}</a></td>
+      <td>{{ ticket.get_status_display }}</td>
+      <td>{{ ticket.get_priority_display }}</td>
+      <td>{{ ticket.client }}</td>
+      <td>{{ ticket.reporter }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="6">Aucun ticket associé à ce projet</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

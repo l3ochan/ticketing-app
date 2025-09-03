@@ -7,7 +7,10 @@
 </head>
 <body class="container mt-4">
   <nav class="mb-3">
+    <a href="{% url 'tickets:dashboard' %}">Acceuil</a> |
     <a href="{% url 'tickets:ticket_list' %}">Tickets</a> |
+    <a href="{% url 'tickets:client_list' %}">Clients</a> |
+    <a href="{% url 'tickets:project_list' %}">Projets</a> |
     {% if user.is_authenticated %}
       Connecté en tant que {{ user.username }} |
       <a href="{% url 'logout' %}">Déconnexion</a>
