@@ -11,14 +11,8 @@
 
 <p><strong>Projet :</strong> {{ object.project }}</p>
 
-<!-- "Créé par" : montrer le reporter s'il existe, sinon le customer -->
-<p><strong>Ouvert par :</strong>
-  {% if object.reporter %}
-    {{ object.reporter }}
-  {% else %}
-    {{ object.customer }}
-  {% endif %}
-</p>
+
+
 
 <a class="btn btn-secondary" href="{% url 'tickets:ticket_update' object.id %}">Modifier</a>
 <form method="post" action="{% url 'tickets:ticket_close' object.id %}" style="display:inline;">

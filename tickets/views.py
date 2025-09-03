@@ -11,19 +11,34 @@ from django import forms
 
 User = get_user_model()
 
+
+class ClientScopedQuerysetMixin:
+    def scope_queryset(self, qs):
+        u = self.request.user
+        if getattr(u, "role", None) == "CLI":
+            qs = qs.filter(customer=u)
+        return qs
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return self.scope_queryset(qs)
+    
 class ReporterRequiredMixin(UserPassesTestMixin):
     def test_func(self): return self.request.user.is_authenticated and self.request.user.is_reporter
 
 class DeveloperRequiredMixin(UserPassesTestMixin):
     def test_func(self): return self.request.user.is_authenticated and self.request.user.is_developer
 
-class TicketListView(LoginRequiredMixin, ListView):
+class TicketListView(LoginRequiredMixin, ClientScopedQuerysetMixin, ListView):
     model = Ticket
     paginate_by = 20
     ordering = "-created_at"
 
-class TicketDetailView(LoginRequiredMixin, DetailView):
+
+
+class TicketDetailView(LoginRequiredMixin, ClientScopedQuerysetMixin, DetailView):
     model = Ticket
+
 
 class TicketCreateView(LoginRequiredMixin, CreateView):
     model = Ticket
@@ -37,6 +52,7 @@ class TicketCreateView(LoginRequiredMixin, CreateView):
         if getattr(user, "role", None) == "CLI":
             # 👉 client : on enlève le champ du formulaire (sinon il est requis et non posté)
             form.fields.pop("customer", None)
+            form.fields.pop("assignee", None)
             # et on fixe la valeur sur l'instance AVANT validation
             form.instance.customer = user
             # restreindre les projets du select
@@ -68,26 +84,24 @@ class TicketCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class TicketUpdateView(LoginRequiredMixin, UpdateView):
+class TicketUpdateView(LoginRequiredMixin, ClientScopedQuerysetMixin, UpdateView):
     model = Ticket
     fields = ["title","description","priority","assignee","status"]
-    def dispatch(self, request, *args, **kwargs):
-        # Exemple de règle : seuls devs ou le reporter peuvent modifier
-        obj = self.get_object()
-        if not (request.user.is_developer or obj.reporter_id == request.user.id):
-            return redirect("tickets:ticket_detail", pk=obj.pk)
-        return super().dispatch(request, *args, **kwargs)
 
 
 @login_required
 @require_POST
 def ticket_close(request, pk):
     t = get_object_or_404(Ticket, pk=pk)
-    # Exemple : seuls devs ferment
-    if request.user.is_developer:
-        t.status = t.Status.CLOSED
-        t.closed_at = now()
-        t.save()
+    # Clients : jamais
+    if getattr(request.user, "role", None) == "CLI":
+        raise PermissionDenied("Vous ne pouvez pas clôturer ce ticket.")
+    # Dev/Reporter : autorisés ? à toi de choisir; ici on autorise dev/staff seulement
+    if not (getattr(request.user, "is_developer", False) or request.user.is_staff):
+        raise PermissionDenied("Action réservée aux développeurs.")
+    t.status = t.Status.CLOSED
+    t.closed_at = timezone.now()
+    t.save()
     return redirect("tickets:ticket_detail", pk=pk)
 
 

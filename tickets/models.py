@@ -19,7 +19,6 @@ class Project(models.Model):
     def __str__(self):
         return f"{self.name}"
 
-
 # tickets/models.py
 from django.conf import settings
 from django.db import models
