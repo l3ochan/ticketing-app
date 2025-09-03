@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Clients{% endblock %}
+{% block content %}
+<h1>Clients</h1>
+<a href="{% url 'tickets:client_create' %}" class="btn btn-primary mb-3">Nouveau client</a>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Nom</th>
+      <th>Téléphone</th>
+      <th>Entreprise</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for client in object_list %}
+      <tr>
+        <td><a href="{% url 'tickets:client_detail' client.id %}">{{ client.name }}</a></td>
+        <td>{{ client.phone_number }}</td>
+        <td>{{ client.company }}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="3">Aucun client trouvé</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

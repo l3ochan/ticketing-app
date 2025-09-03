@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Client {{ object.name }}{% endblock %}
+{% block content %}
+<h2>{{ object.name }}</h2>
+<p><strong>Téléphone :</strong> {{ object.phone_number }}</p>
+<p><strong>Entreprise :</strong> {{ object.company }}</p>
+
+<a href="{% url 'tickets:client_update' object.id %}" class="btn btn-warning">Modifier</a>
+<a href="{% url 'tickets:client_list' %}" class="btn btn-secondary">Retour</a>
+{% endblock %}
