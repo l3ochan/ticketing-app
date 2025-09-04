@@ -13,12 +13,11 @@ class UserAdmin(DjangoUserAdmin):
     ordering = ("username",)
 
     # Écrans d'édition d'un user existant
-    fieldsets = (
-        (None, {"fields": ("username", "password")}),
-        (_("Personal info"), {"fields": ("first_name", "last_name", "email")}),
-        (_("Permissions"), {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
-        (_("Important dates"), {"fields": ("last_login", "date_joined")}),
-        (_("Helpdesk"), {"fields": ("role",)}),  
+    add_fieldsets = (
+        (None, {
+            "classes": ("wide",),
+            "fields": ("username", "email", "role", "password1", "password2"),
+        }),
     )
 
     # Écran de création d’un user (hash automatique via password1/password2)

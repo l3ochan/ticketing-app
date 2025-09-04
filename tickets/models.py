@@ -82,10 +82,6 @@ class Ticket(models.Model):
     def clean(self):
         errors = {}
 
-        # Reporter doit être un REPORTER
-        if self.reporter and getattr(self.reporter, "role", None) != "REP":
-            errors["reporter"] = "Le reporter doit avoir le rôle REPORTER."
-
         # Assignee (si présent) doit être un DEV
         if self.assignee and getattr(self.assignee, "role", None) != "DEV":
             errors["assignee"] = "L’intervenant assigné doit être un développeur."

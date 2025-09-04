@@ -9,7 +9,6 @@ from django import forms
 from django.contrib import messages
 from .models import Ticket, Project, Comment, Client
 from django.db.models import Count
-from django.core.exceptions import PermissionDenied
 
 def custom_permission_denied_view(request, exception=None):
     return render(request, '403.html', status=403)
@@ -149,14 +148,13 @@ class TicketCreateView(LoginRequiredMixin, ReporterRequiredMixin,  CreateView):
         form = super().get_form(form_class)
         user = self.request.user
 
-        # 👇 Récupère tous les clients en base
+        # Récupère tous les clients en base
         form.fields["client"].queryset = Client.objects.all()
 
-        # 👇 Récupère tous les projets en base
+        # récupère tous les projets en base
         form.fields["project"].queryset = Project.objects.all()
 
         form.fields["assignee"].queryset = User.objects.filter(role="DEV", is_active=True)
-        form.instance.reporter = user
 
         # Masquer "assignee" si l'utilisateur n'est pas développeur ni staff
         if not (getattr(user, "is_reporter", False) or user.is_staff):
@@ -170,9 +168,9 @@ class TicketCreateView(LoginRequiredMixin, ReporterRequiredMixin,  CreateView):
         return super().form_valid(form)
 
 
-class TicketUpdateView(LoginRequiredMixin, UpdateView):
+class TicketUpdateView(LoginRequiredMixin, ReporterRequiredMixin, UpdateView):
     model = Ticket
-    fields = ["title", "description", "priority", "assignee", "status"]
+    fields = ["title", "description", "project", "priority", "assignee"]
 
 
 # --- Commentaires ---
