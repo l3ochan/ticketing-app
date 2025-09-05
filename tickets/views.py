@@ -13,6 +13,15 @@ from django.db.models import Count
 def custom_permission_denied_view(request, exception=None):
     return render(request, '403.html', status=403)
 
+
+class ReporterRequiredMixin(UserPassesTestMixin):
+    def test_func(self): return self.request.user.is_authenticated and (self.request.user.is_reporter or self.request.user.is_staff or self.request.user.is_superuser)
+
+class DeveloperRequiredMixin(UserPassesTestMixin):
+    def test_func(self): return self.request.user.is_authenticated and (self.request.user.is_developer or self.request.user.is_staff or self.request.user.is_superuser)
+
+
+
 User = get_user_model()
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -50,12 +59,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         ]
 
         return context
-class ReporterRequiredMixin(UserPassesTestMixin):
-    def test_func(self): return self.request.user.is_authenticated and (self.request.user.is_reporter or self.request.user.is_staff or self.request.user.is_superuser)
-
-class DeveloperRequiredMixin(UserPassesTestMixin):
-    def test_func(self): return self.request.user.is_authenticated and (self.request.user.is_developer or self.request.user.is_staff or self.request.user.is_superuser)
-
 
 
 # --- Vu des projets ---

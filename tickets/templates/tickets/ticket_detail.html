@@ -10,6 +10,7 @@
 <p><strong>Dev assigné :</strong> {{ object.assignee }}</p>
 <p><strong>Ouvert par: </strong> {{ object.reporter }} </p>
 <p><strong>Niveau de priorité</strong> {{ object.get_priority_display }}</p>
+<p><strong>Créé le </strong> {{ object.created_at }}</p>
 
 <hr>
 
@@ -47,9 +48,11 @@
   </div>
 </form>
 
-<!-- Bouton modifier -->
-<a href="{% url 'tickets:ticket_update' object.id %}" class="btn btn-warning mt-3">✎ Modifier le ticket</a>
 
 <!-- Bouton retour -->
 <a href="{% url 'tickets:ticket_list' %}" class="btn btn-secondary mt-3">← Retour aux tickets</a>
+
+<!-- Bouton modifier -->
+<a href="{% url 'tickets:ticket_update' object.id %}" class="btn btn-warning mt-3">✎ Modifier le ticket</a>
+
 {% endblock %}
