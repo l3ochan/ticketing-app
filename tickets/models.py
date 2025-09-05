@@ -11,7 +11,10 @@ class Project(models.Model):
     description = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.name}"
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("tickets:project_detail", args=[self.pk])
     
 
 class Client(models.Model):
@@ -26,6 +29,9 @@ class Client(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.company})"
+
+    def get_absolute_url(self):
+        return reverse("tickets:client_detail", args=[self.pk])
 
 
 class Ticket(models.Model):

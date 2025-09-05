@@ -12,7 +12,7 @@
   <tbody>
   {% for t in object_list %}
     <tr
-      {% if t.status != "CLO" %}
+      {% if t.status != "CLO" or t.status != "RES" %}
         {% if t.priority == "URG" %}
           class="table-danger fw-bold"
         {% elif t.priority == "HIG" %}
@@ -24,7 +24,7 @@
       <td><a href="{% url 'tickets:ticket_detail' t.id %}">{{ t.title }}</a></td>
       <td>{{ t.get_status_display }}</td>
       <td>
-        {% if t.status != "CLO" %}
+        {% if t.status != "CLO" or t.status != "RES" %}
           {% if t.priority == "URG" %}
             <span class="text-danger fw-bold">{{ t.get_priority_display }}</span>
           {% elif t.priority == "HIG" %}

@@ -24,6 +24,8 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 ALLOWED_HOSTS = ["*"]
 
+CSRF_TRUSTED_ORIGINS= ["https://sae502.nekocorp.fr"]
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
