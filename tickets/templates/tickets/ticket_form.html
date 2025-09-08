@@ -4,6 +4,8 @@
 <form method="post">
   {% csrf_token %}
   {{ form.as_p }}
-  <button class="btn btn-primary" type="submit">Enregistrer</button>
+  <a class="btn btn-secondary" href="{% url 'tickets:ticket_list' %}" style="display:inline;">← Annuler</a>
+  <button class="btn btn-success" type="submit" style="display:inline;">💾Enregistrer</button>
 </form>
+  
 {% endblock %}

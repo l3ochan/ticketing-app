@@ -50,9 +50,53 @@
 
 
 <!-- Bouton retour -->
-<a href="{% url 'tickets:ticket_list' %}" class="btn btn-secondary mt-3">← Retour aux tickets</a>
+<a href="{% url 'tickets:ticket_list' %}" class="btn btn-secondary mt-3">← Retour à la liste</a>
 
 <!-- Bouton modifier -->
-<a href="{% url 'tickets:ticket_update' object.id %}" class="btn btn-warning mt-3">✎ Modifier le ticket</a>
+<a href="{% url 'tickets:ticket_update' object.id %}" class="btn btn-warning mt-3">✏️Modifier</a>
+
+{% if object.status == "OPEN" %}
+  <a href="{% url 'tickets:ticket_assign' object.id %}" class="btn btn-warning mt-3">
+    👤Assigner
+  </a>
+{% endif %}
+
+
+{% if object.status == "WIP" %}
+  {% if request.user.is_staff or request.user.is_developer %}
+    <form method="post" action="{% url 'tickets:ticket_resolve' object.id %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-success mt-3">
+        ✅Marquer comme résolu
+      </button>
+    </form>
+  {% endif %}
+{% endif %}
+
+
+
+{% if object.status == "RES" %}
+  {% if request.user.is_staff or request.user.is_developer %}
+    <form method="post" action="{% url 'tickets:ticket_close' object.id %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger mt-3">
+        🔒Clôturer
+      </button>
+    </form>
+  {% endif %}
+{% endif %}
+
+
+
+{% if object.status == "CLO" %}
+  {% if request.user.is_staff or request.user.is_reporter %}
+    <form method="post" action="{% url 'tickets:ticket_reopen' object.id %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-success mt-3">
+        🔓Réouvrir
+      </button>
+    </form>
+  {% endif %}
+{% endif %}
 
 {% endblock %}

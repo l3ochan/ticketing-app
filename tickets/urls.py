@@ -8,6 +8,8 @@ urlpatterns = [
     path("<int:pk>/", views.TicketDetailView.as_view(), name="ticket_detail"),
     path("<int:pk>/edit/", views.TicketUpdateView.as_view(), name="ticket_update"),
     path("<int:pk>/close/", views.ticket_close, name="ticket_close"),
+    path("<int:pk>/resolve/", views.ticket_resolve, name="ticket_resolve"),
+    path("<int:pk>/reopen/", views.ticket_reopen, name="ticket_reopen"),
     path("<int:pk>/comment/", views.add_comment, name="add_comment"),
     path("clients/", views.ClientListView.as_view(), name="client_list"),
     path("clients/new/", views.ClientCreateView.as_view(), name="client_create"),
@@ -18,4 +20,5 @@ urlpatterns = [
     path("projects/new/", views.ProjectCreateView.as_view(), name="project_create"),
     path("projects/<int:pk>/", views.ProjectDetailView.as_view(), name="project_detail"),
     path("projects/<int:pk>/edit/", views.ProjectUpdateView.as_view(), name="project_update"),
+    path("<int:pk>/assign/", views.ticket_assign, name="ticket_assign"),
 ]

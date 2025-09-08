@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Assigner le ticket{% endblock %}
+
+{% block content %}
+<h1>Assigner le ticket #{{ ticket.id }}</h1>
+<p><strong>{{ ticket.title }}</strong></p>
+<p>{{ ticket.description }}</p>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-success">Assigner</button>
+  <a href="{% url 'tickets:ticket_detail' ticket.id %}" class="btn btn-secondary">Annuler</a>
+</form>
+{% endblock %}

@@ -207,11 +207,6 @@ def add_comment(request, pk):
 def ticket_close(request, pk):
     t = get_object_or_404(Ticket, pk=pk)
 
-    # Clients interdits (même si théoriquement ils n’ont plus de login)
-    if getattr(request.user, "role", None) == "CLI":
-        from django.core.exceptions import PermissionDenied
-        raise PermissionDenied("Vous ne pouvez pas clôturer ce ticket.")
-
     # Seuls devs ou staff peuvent clôturer
     if not (getattr(request.user, "is_developer", False) or request.user.is_staff):
         from django.core.exceptions import PermissionDenied
@@ -219,5 +214,62 @@ def ticket_close(request, pk):
 
     t.status = t.Status.CLOSED
     t.closed_at = timezone.now()
+    t.save()
+    return redirect("tickets:ticket_detail", pk=pk)
+
+
+class AssignTicketForm(forms.Form):
+    assignee = forms.ModelChoiceField(
+        queryset=User.objects.filter(role="DEV", is_active=True),
+        label="Développeur",
+    )
+
+@login_required
+def ticket_assign(request, pk):
+    ticket = get_object_or_404(Ticket, pk=pk)
+
+    # On n'assigne que si le ticket est encore ouvert
+    if ticket.status != Ticket.Status.OPEN:
+        from django.core.exceptions import PermissionDenied
+        raise PermissionDenied("Ce ticket n'est pas ouvert et ne peut plus être assigné.")
+
+    if request.method == "POST":
+        form = AssignTicketForm(request.POST)
+        if form.is_valid():
+            ticket.assignee = form.cleaned_data["assignee"]
+            ticket.status = Ticket.Status.IN_PROGRESS
+            ticket.save()
+            messages.success(request, f"Ticket assigné à {ticket.assignee}.")
+            return redirect("tickets:ticket_detail", pk=ticket.pk)
+    else:
+        form = AssignTicketForm()
+
+    return render(request, "tickets/ticket_assign.html", {"ticket": ticket, "form": form})
+
+
+@login_required
+def ticket_resolve(request, pk):
+    t = get_object_or_404(Ticket, pk=pk)
+
+    # Seuls devs ou staff peuvent clôturer
+    if not (getattr(request.user, "is_developer", False) or request.user.is_staff):
+        from django.core.exceptions import PermissionDenied
+        raise PermissionDenied("Action réservée aux développeurs.")
+
+    t.status = t.Status.RESOLVED
+    t.save()
+    return redirect("tickets:ticket_detail", pk=pk)
+
+
+@login_required
+def ticket_reopen(request, pk):
+    t = get_object_or_404(Ticket, pk=pk)
+
+    # Seuls devs ou staff peuvent clôturer
+    if not (getattr(request.user, "is_reporter", False) or request.user.is_staff):
+        from django.core.exceptions import PermissionDenied
+        raise PermissionDenied("Action réservée aux rapporteurs.")
+
+    t.status = t.Status.IN_PROGRESS
     t.save()
     return redirect("tickets:ticket_detail", pk=pk)
