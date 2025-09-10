@@ -1,48 +1,136 @@
+{# templates/tickets/ticket_list.html #}
 {% extends "base.html" %}
 {% block title %}Liste des tickets{% endblock %}
 {% block content %}
+
 <h1>Tickets</h1>
-<a class="btn btn-primary" href="{% url 'tickets:ticket_create' %}">Nouveau ticket</a>
-<table class="table mt-3">
+
+<a class="btn btn-primary mb-3" href="{% url 'tickets:ticket_create' %}">Nouveau ticket</a>
+
+<form method="get" class="mb-3 row g-2 align-items-end">
+
+
+
+<div class="row g-2 align-items-end flex-nowrap">
+  <div class="col-auto">
+    <label class="form-label">Rechercher</label>
+    <input type="search" name="q" value="{{ current.q }}" class="form-control"
+           placeholder="Titre, description, client, app, reporter, dev…">
+  </div>
+
+  <div class="col-md-2">
+    <label class="form-label">Statuts</label>
+    <select name="status" multiple placeholder="-- Statuts --">
+      {% for code,label in status_choices %}
+        <option value="{{ code }}" {% if code in current.status %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-2">
+    <label class="form-label">Priorités</label>
+    <select name="priority" multiple placeholder="-- Priorités --">
+      {% for code,label in priority_choices %}
+        <option value="{{ code }}" {% if code in current.priority %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-2">
+    <label class="form-label">Clients</label>
+    <select name="client" multiple placeholder="-- Clients --">
+      {% for c in clients %}
+        <option value="{{ c.id }}" {% if c.id|stringformat:"s" in current.client %}selected{% endif %}>
+          {{ c.company }} — {{ c.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-2">
+    <label class="form-label">Projets</label>
+    <select name="project" multiple placeholder="-- Projets --">
+      {% for p in projects %}
+        <option value="{{ p.id }}" {% if p.id|stringformat:"s" in current.project %}selected{% endif %}>
+          {{ p.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-auto">
+    <button class="btn btn-outline-primary" type="submit">Filtrer</button>
+  </div>
+</div>
+
+  {% if request.GET %}
+    <div class="col-12 mt-2">
+      <a class="btn btn-sm btn-outline-secondary" href="{% url 'tickets:ticket_list' %}">Réinitialiser</a>
+    </div>
+  {% endif %}
+</form>
+
+{# Tri : conserve tous les filtres multi via qs_without_sort #}
+<div class="mb-2">
+  <span class="text-muted me-2">Trier par :</span>
+  <a class="btn btn-sm btn-outline-secondary me-1" href="?{{ qs_without_sort }}&sort=-created">Date ▼</a>
+  <a class="btn btn-sm btn-outline-secondary me-1" href="?{{ qs_without_sort }}&sort=created">Date ▲</a>
+  <a class="btn btn-sm btn-outline-secondary me-1" href="?{{ qs_without_sort }}&sort=priority">Priorité ▲</a>
+  <a class="btn btn-sm btn-outline-secondary me-1" href="?{{ qs_without_sort }}&sort=-priority">Priorité ▼</a>
+  <a class="btn btn-sm btn-outline-secondary me-1" href="?{{ qs_without_sort }}&sort=status">Statut ▲</a>
+  <a class="btn btn-sm btn-outline-secondary me-1" href="?{{ qs_without_sort }}&sort=-status">Statut ▼</a>
+  <a class="btn btn-sm btn-outline-secondary me-1" href="?{{ qs_without_sort }}&sort=client">Client ▲</a>
+  <a class="btn btn-sm btn-outline-secondary me-1" href="?{{ qs_without_sort }}&sort=-client">Client ▼</a>
+  <a class="btn btn-sm btn-outline-secondary me-1" href="?{{ qs_without_sort }}&sort=project">Projet ▲</a>
+  <a class="btn btn-sm btn-outline-secondary" href="?{{ qs_without_sort }}&sort=-project">Projet ▼</a>
+</div>
+
+<table class="table mt-2">
   <thead>
     <tr>
-      <th>ID</th><th>Titre</th><th>Statut</th><th>Niveau de priorité</th><th>Client</th><th>Reporter</th><th>Projet</th>
+      <th>ID</th><th>Titre</th><th>Statut</th><th>Priorité</th><th>Client</th><th>Reporter</th><th>Projet</th><th>Créé</th>
     </tr>
   </thead>
   <tbody>
   {% for t in object_list %}
     <tr
-      {% if t.status != "CLO" or t.status != "RES" %}
-        {% if t.priority == "URG" %}
-          class="table-danger fw-bold"
-        {% elif t.priority == "HIG" %}
-          class="table-warning fw-bold"
+      {% if t.status != "CLO" and t.status != "RES" %}
+        {% if t.priority == "URG" %} class="table-danger fw-bold"
+        {% elif t.priority == "HIG" %} class="table-warning fw-bold"
         {% endif %}
       {% endif %}
     >
       <td>{{ t.id }}</td>
       <td><a href="{% url 'tickets:ticket_detail' t.id %}">{{ t.title }}</a></td>
       <td>{{ t.get_status_display }}</td>
-      <td>
-        {% if t.status != "CLO" or t.status != "RES" %}
-          {% if t.priority == "URG" %}
-            <span class="text-danger fw-bold">{{ t.get_priority_display }}</span>
-          {% elif t.priority == "HIG" %}
-            <span class="text-warning fw-bold">{{ t.get_priority_display }}</span>
-          {% else %}
-            {{ t.get_priority_display }}
-          {% endif %}
-        {% else %}
-          {{ t.get_priority_display }}
-        {% endif %}
-      </td>
+      <td>{{ t.get_priority_display }}</td>
       <td>{{ t.client }}</td>
       <td>{{ t.reporter }}</td>
       <td>{{ t.project }}</td>
+      <td>{{ t.created_at|date:"Y-m-d H:i" }}</td>
     </tr>
   {% empty %}
-    <tr><td colspan="7">Aucun ticket</td></tr>
+    <tr><td colspan="8">Aucun ticket</td></tr>
   {% endfor %}
   </tbody>
 </table>
+
+<script>
+  const minimalOpts = {
+    plugins: ['remove_button'],
+    create: false,
+    persist: false,
+    hideSelected: true,
+    closeAfterSelect: false,
+    maxOptions: 5000, // évite de paginer côté UI si tu as beaucoup d'items
+    placeholder: null // le placeholder vient de l’attribut HTML "placeholder"
+  };
+
+  new TomSelect('select[name="status"]',  minimalOpts);
+  new TomSelect('select[name="priority"]', minimalOpts);
+  new TomSelect('select[name="client"]',  minimalOpts);
+  new TomSelect('select[name="project"]', minimalOpts);
+</script>
+
+
 {% endblock %}

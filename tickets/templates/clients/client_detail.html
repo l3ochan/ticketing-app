@@ -5,6 +5,40 @@
 <p><strong>Téléphone :</strong> {{ object.phone_number }}</p>
 <p><strong>Entreprise :</strong> {{ object.company }}</p>
 
-<a href="{% url 'tickets:client_update' object.id %}" class="btn btn-warning">Modifier</a>
 <a href="{% url 'tickets:client_list' %}" class="btn btn-secondary">Retour</a>
+<a href="{% url 'tickets:client_update' object.id %}" class="btn btn-warning">Modifier</a>
+{% if request.user.is_staff or request.user.is_reporter %}
+  <a href="{% url 'tickets:client_delete' object.pk %}" class="btn btn-danger">
+    🗑️Supprimer
+  </a>
+{% endif %}
+<h2 class="mt-4">Tickets liés</h2>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Titre</th>
+      <th>Status</th>
+      <th>Priorité</th>
+      <th>Client</th>
+      <th>Reporter</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for ticket in object.tickets.all %}
+    <tr>
+      <td>{{ ticket.id }}</td>
+      <td><a href="{% url 'tickets:ticket_detail' ticket.id %}">{{ ticket.title }}</a></td>
+      <td>{{ ticket.get_status_display }}</td>
+      <td>{{ ticket.get_priority_display }}</td>
+      <td>{{ ticket.client }}</td>
+      <td>{{ ticket.reporter }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="6">Aucun ticket associé à ce projet</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}

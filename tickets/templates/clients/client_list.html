@@ -3,6 +3,13 @@
 {% block content %}
 <h1>Clients</h1>
 <a href="{% url 'tickets:client_create' %}" class="btn btn-primary mb-3">Nouveau client</a>
+<form method="get" class="mb-3 d-flex gap-2">
+  <input type="search" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="Rechercher (nom, société, téléphone)…">
+  <button class="btn btn-outline-primary" type="submit">Rechercher</button>
+  {% if request.GET.q %}
+    <a class="btn btn-outline-secondary" href="{% url 'tickets:client_list' %}">Réinitialiser</a>
+  {% endif %}
+</form>
 <table class="table table-striped">
   <thead>
     <tr>

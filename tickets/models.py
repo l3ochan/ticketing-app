@@ -94,6 +94,14 @@ class Ticket(models.Model):
 
         if errors:
             raise ValidationError(errors)
+    class Meta:
+        indexes = [
+            models.Index(fields=["status"]),
+            models.Index(fields=["priority"]),
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["client"]),
+            models.Index(fields=["project"]),
+        ]
 
 
 
@@ -101,6 +109,7 @@ class Comment(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name="comments")
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     body = models.TextField()
+    is_system = models.BooleanField(default=False)  # 👈 NEW
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -5,9 +5,13 @@
 <h1>Projet : {{ object.name }}</h1>
 
 <p><strong>Description :</strong> {{ object.description }}</p>
-
-<a class="btn btn-secondary" href="{% url 'tickets:project_update' object.id %}">Modifier le projet</a>
 <a class="btn btn-primary" href="{% url 'tickets:project_list' %}">Retour à la liste</a>
+<a class="btn btn-secondary" href="{% url 'tickets:project_update' object.id %}">Modifier le projet</a>
+{% if request.user.is_staff or request.user.is_developer %}
+  <a href="{% url 'tickets:project_delete' object.pk %}" class="btn btn-danger">
+    🗑️Supprimer
+  </a>
+{% endif %}
 
 <h2 class="mt-4">Tickets liés</h2>
 <table class="table table-striped">

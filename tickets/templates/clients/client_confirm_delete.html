@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Supprimer le ctlien{% endblock %}
+{% block content %}
+
+<h1>Supprimer le client #{{ object.id }}</h1>
+<p>Êtes vous sur de vouloir supprimer le client <strong>{{ object.name }}</strong> ?</p>
+
+<form method="post">
+  {% csrf_token %}
+  <a href="{{ object.get_absolute_url }}" class="btn btn-secondary">Annuler</a>
+  <button type="submit" class="btn btn-danger">Supprimer</button>
+</form>
+
+{% endblock %}

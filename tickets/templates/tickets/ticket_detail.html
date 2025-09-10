@@ -17,7 +17,15 @@
 <h3>Chat</h3>
 <div class="chat-box border p-3 mb-3 bg-light" style="max-height:400px; overflow-y:auto;">
   {% for comment in object.comments.all %}
-    {% if comment.author == request.user %}
+    {% if comment.is_system %}
+      <!-- Ligne système, centrée -->
+      <div class="d-flex justify-content-center mb-2">
+        <div class="px-2 py-1 rounded bg-white border text-muted small">
+          {{ comment.body|safe }}
+          <span class="ms-2 text-secondary">— {{ comment.created_at|date:"d/m/Y H:i" }}</span>
+        </div>
+      </div>
+    {% elif comment.author == request.user %}
       <!-- Bulle à droite (utilisateur courant) -->
       <div class="d-flex justify-content-end mb-2">
         <div class="p-2 rounded bg-primary text-white" style="max-width:70%;">
@@ -40,13 +48,16 @@
   {% endfor %}
 </div>
 
-<form method="post" action="{% url 'tickets:add_comment' object.id %}">
-  {% csrf_token %}
-  <div class="input-group">
-    {{ form.body }}
-    <button type="submit" class="btn btn-primary">Envoyer</button>
-  </div>
-</form>
+
+{% if object.status != "CLO" %}
+  <form method="post" action="{% url 'tickets:add_comment' object.id %}">
+    {% csrf_token %}
+    <div class="input-group">
+      {{ form.body }}
+      <button type="submit" class="btn btn-primary">Envoyer</button>
+    </div>
+  </form>
+{% endif %}
 
 
 <!-- Bouton retour -->
@@ -75,7 +86,7 @@
 
 
 
-{% if object.status == "RES" %}
+{% if object.status != "CLO" %}
   {% if request.user.is_staff or request.user.is_developer %}
     <form method="post" action="{% url 'tickets:ticket_close' object.id %}" style="display:inline;">
       {% csrf_token %}
@@ -99,4 +110,9 @@
   {% endif %}
 {% endif %}
 
+{% if request.user.is_staff or request.user.is_reporter %}
+  <a href="{% url 'tickets:ticket_delete' object.pk %}" class="btn btn-danger mt-3">
+    🗑️Supprimer
+  </a>
+{% endif %}
 {% endblock %}

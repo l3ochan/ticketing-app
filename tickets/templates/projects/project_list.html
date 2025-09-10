@@ -4,6 +4,13 @@
 {% block content %}
 <h1>Projets</h1>
 <a class="btn btn-primary mb-3" href="{% url 'tickets:project_create' %}">Nouveau projet</a>
+<form method="get" class="mb-3 d-flex gap-2">
+  <input type="search" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="Rechercher (nom, description)…">
+  <button class="btn btn-outline-primary" type="submit">Rechercher</button>
+  {% if request.GET.q %}
+    <a class="btn btn-outline-secondary" href="{% url 'tickets:project_list' %}">Réinitialiser</a>
+  {% endif %}
+</form>
 
 <table class="table table-striped">
   <thead>
