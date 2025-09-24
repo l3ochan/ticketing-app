@@ -14,7 +14,7 @@ COMPOSE_FILE="${BASE_DIR}/docker-compose.yml"
 ENV_FILE="${BASE_DIR}/.env"
 
 # Mettez ici l'URL réelle de votre docker-compose.yml
-COMPOSE_URL="https://example.com/path/to/docker-compose.yml"
+COMPOSE_URL="https://raw.githubusercontent.com/l3ochan/ticketing-app/refs/heads/main/docker-compose.yml"
 
 # ========= Fonctions utilitaires =========
 need_root() {
