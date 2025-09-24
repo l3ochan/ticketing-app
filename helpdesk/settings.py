@@ -44,7 +44,7 @@ DATABASES = {
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-0$nn5-=g1^z)lgly&xo05w1cvcc+hu8&(_(2f7+uo-iyz2c*dx'
+SECRET_KEY = env("TICKETARR_SECRET"),
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -132,7 +132,7 @@ STATICFILES_DIRS = [BASE_DIR / "static"]  # new
 
 LANGUAGE_CODE = 'fr-fr'
 
-TIME_ZONE = 'Europe/Paris'
+TIME_ZONE = env("TZ")
 
 USE_I18N = True
 
